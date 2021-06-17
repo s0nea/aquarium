@@ -148,16 +148,8 @@ export class InstallCreateWizardPageComponent implements OnInit {
    * This step starts the bootstrap process
    */
   startBootstrap(): void {
-    this.nodesService.setHostname(this.context.config.hostname).subscribe({
-      complete: () => {
-        this.blockUI.start(translate(TEXT('Please wait, checking node status ...')));
-        this.pollNodeStatus();
-      },
-      error: (err) => {
-        err.preventDefault();
-        this.handleError(err.message);
-      }
-    });
+    this.blockUI.start(translate(TEXT('Please wait, checking node status ...')));
+    this.pollNodeStatus();
   }
 
   finishDeployment(): void {
@@ -216,7 +208,10 @@ export class InstallCreateWizardPageComponent implements OnInit {
   private doBootstrap(): void {
     this.context.stepperVisible = false;
     this.blockUI.start(translate(TEXT('Please wait, bootstrapping will be started ...')));
-    this.nodesService.deploymentStart({ ntpaddr: this.context.config.ntpAddress }).subscribe({
+    this.nodesService.deploymentStart({
+      ntpaddr: this.context.config.ntpAddress,
+      hostname: this.context.config.hostname
+    }).subscribe({
       next: (basicReplay: DeploymentBasicReply) => {
         if (basicReplay.success) {
           this.context.stage = 'bootstrapping';
