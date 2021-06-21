@@ -17,7 +17,6 @@ import { MatStepper } from '@angular/material/stepper';
 import { marker as TEXT } from '@biesbjerg/ngx-translate-extract-marker';
 import _ from 'lodash';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
-import { concat } from 'rxjs';
 
 import { translate } from '~/app/i18n.helper';
 import { InstallWizardContext } from '~/app/pages/install-wizard/models/install-wizard-context.type';
@@ -120,13 +119,11 @@ export class InstallJoinWizardPageComponent implements OnInit {
     this.context.stage = 'joining';
     this.context.stepperVisible = false;
     this.blockUI.start(translate(TEXT('Please wait, start joining existing cluster ...')));
-    concat(
-      this.nodesService.setHostname(this.context.config.hostname),
-      this.nodesService.join({
-        address: `${this.context.config.address}:${this.context.config.port}`,
-        token: this.context.config.token
-      })
-    ).subscribe({
+    this.nodesService.join({
+      address: `${this.context.config.address}:${this.context.config.port}`,
+      token: this.context.config.token,
+      hostname: this.context.config.hostname
+    }).subscribe({
       next: (success: boolean) => {
         if (success) {
           this.blockUI.update(
