@@ -119,23 +119,25 @@ export class InstallJoinWizardPageComponent implements OnInit {
     this.context.stage = 'joining';
     this.context.stepperVisible = false;
     this.blockUI.start(translate(TEXT('Please wait, start joining existing cluster ...')));
-    this.nodesService.join({
-      address: `${this.context.config.address}:${this.context.config.port}`,
-      token: this.context.config.token,
-      hostname: this.context.config.hostname
-    }).subscribe({
-      next: (success: boolean) => {
-        if (success) {
-          this.blockUI.update(
-            translate(TEXT('Please wait, joining existing cluster in progress ...'))
-          );
-          this.pollJoiningStatus();
-        } else {
-          this.handleError(TEXT('Failed to join existing cluster.'));
-        }
-      },
-      error: (err) => this.handleError(err.message)
-    });
+    this.nodesService
+      .join({
+        address: `${this.context.config.address}:${this.context.config.port}`,
+        token: this.context.config.token,
+        hostname: this.context.config.hostname
+      })
+      .subscribe({
+        next: (success: boolean) => {
+          if (success) {
+            this.blockUI.update(
+              translate(TEXT('Please wait, joining existing cluster in progress ...'))
+            );
+            this.pollJoiningStatus();
+          } else {
+            this.handleError(TEXT('Failed to join existing cluster.'));
+          }
+        },
+        error: (err) => this.handleError(err.message)
+      });
   }
 
   private handleError(err: any): void {

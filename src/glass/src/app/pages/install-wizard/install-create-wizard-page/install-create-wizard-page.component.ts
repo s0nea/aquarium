@@ -208,24 +208,26 @@ export class InstallCreateWizardPageComponent implements OnInit {
   private doBootstrap(): void {
     this.context.stepperVisible = false;
     this.blockUI.start(translate(TEXT('Please wait, bootstrapping will be started ...')));
-    this.nodesService.deploymentStart({
-      ntpaddr: this.context.config.ntpAddress,
-      hostname: this.context.config.hostname
-    }).subscribe({
-      next: (basicReplay: DeploymentBasicReply) => {
-        if (basicReplay.success) {
-          this.context.stage = 'bootstrapping';
-          this.blockUI.update(translate(TEXT('Please wait, bootstrapping in progress ...')));
-          this.pollBootstrapStatus();
-        } else {
-          this.handleError(TEXT('Failed to start bootstrapping the system.'));
+    this.nodesService
+      .deploymentStart({
+        ntpaddr: this.context.config.ntpAddress,
+        hostname: this.context.config.hostname
+      })
+      .subscribe({
+        next: (basicReplay: DeploymentBasicReply) => {
+          if (basicReplay.success) {
+            this.context.stage = 'bootstrapping';
+            this.blockUI.update(translate(TEXT('Please wait, bootstrapping in progress ...')));
+            this.pollBootstrapStatus();
+          } else {
+            this.handleError(TEXT('Failed to start bootstrapping the system.'));
+          }
+        },
+        error: (err) => {
+          err.preventDefault();
+          this.handleError(err.message);
         }
-      },
-      error: (err) => {
-        err.preventDefault();
-        this.handleError(err.message);
-      }
-    });
+      });
   }
 
   private pollBootstrapStatus(): void {
